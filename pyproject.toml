@@ -1,5 +1,5 @@
 [build-system]
-requires = ["hatchling >= 1.26"]
+requires = ["hatchling >= 1.26", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
@@ -38,6 +38,9 @@ dependencies = [
     "mypy",
 ]
 
+[tool.hatch.version]
+source = "vcs"  # Use git tags for versioning
+
 [tool.hatch.envs.dev.scripts]
 test = "pytest -m 'not integration' {args}"
 test-cov = "pytest -m 'not integration' --cov=src/strands_valkey_session_manager {args}"
@@ -53,9 +56,6 @@ type-check = "mypy {args:src}"
 Homepage = "https://github.com/jeromevdl/strands-valkey-session-manager"
 Repository = "https://github.com/jeromevdl/strands-valkey-session-manager"
 Issues = "https://github.com/jeromevdl/strands-valkey-session-manager/issues"
-
-[tool.hatch.version]
-path = "src/strands_valkey_session_manager/__init__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/strands_valkey_session_manager"]

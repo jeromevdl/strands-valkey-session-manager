@@ -12,7 +12,11 @@ def test_agent_with_valkey_session():
     """
     You need to have a valkey/redis cluster/serverless available
     """
-    valkey_client = Valkey(host="localhost", port="6379", decode_responses=True) #, ssl=True, ssl_cert_reqs="none")
+    valkey_client = Valkey(
+        host="localhost",
+        port="6379",
+        decode_responses=True
+    ) #, ssl=True, ssl_cert_reqs="none")
     # valkey_client = Valkey.from_url("rediss://default:key@credible-mastiff-14987.upstash.io:6379")
 
     test_session_id = str(uuid4())
@@ -22,7 +26,11 @@ def test_agent_with_valkey_session():
         agent("Hello!")
         assert len(session_manager.list_messages(test_session_id, agent.agent_id)) == 2
 
-        valkey_client_2 = Valkey(host="localhost", port="6379", decode_responses=True) #, ssl=True, ssl_cert_reqs="none")
+        valkey_client_2 = Valkey(
+            host="localhost",
+            port="6379",
+            decode_responses=True
+        ) #, ssl=True, ssl_cert_reqs="none")
         # valkey_client_2 = Valkey.from_url("rediss://default:key@credible-mastiff-14987.upstash.io:6379")
 
         session_manager_2 = ValkeySessionManager(session_id=test_session_id, client=valkey_client_2)
