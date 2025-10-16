@@ -42,8 +42,8 @@ dependencies = [
 source = "vcs"  # Use git tags for versioning
 
 [tool.hatch.envs.dev.scripts]
-test = "pytest -m 'not integration' {args}"
-test-cov = "pytest -m 'not integration' --cov=src/strands_valkey_session_manager {args}"
+test = "pytest {args}"
+test-cov = "pytest --cov=src/strands_valkey_session_manager {args}"
 test-all = "pytest {args}"
 test-integ = "pytest -m integration {args}"
 format = "hatch fmt --formatter"
@@ -65,6 +65,7 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
 ]
+addopts = "-m 'not integration'"
 
 [tool.ruff]
 line-length = 120
