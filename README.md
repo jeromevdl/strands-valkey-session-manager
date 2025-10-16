@@ -30,21 +30,30 @@ from uuid import uuid4
 import valkey
 
 # Create a Valkey client
-client = valkey.Valkey(host="host", port=6379, decode_responses=True)
+client = valkey.Valkey(host="localhost", port=6379, decode_responses=True)
 
 # Create a session manager with a unique session ID
+session_id = str(uuid4())
 session_manager = ValkeySessionManager(
-    session_id=str(uuid4()),
+    session_id=session_id,
     client=client
 )
 
 # Create an agent with the session manager
 agent = Agent(session_manager=session_manager)
 
-# Use the agent - all messages and state are automatically persisted
+# Use the agent - all messages are automatically persisted
 agent("Hello! Tell me about Valkey.")
 
-# The conversation is now stored in Valkey and can be resumed later
+# The conversation is now stored in Valkey and can be resumed later, using the same session_id
+
+# Display conversation history
+print(f"\n{"=="*30}\n")
+messages = session_manager.list_messages(session_id, agent.agent_id)
+for msg in messages:
+    role = msg.message["role"]
+    content = msg.message["content"][0]["text"]
+    print(f"** {role.upper()}**: {content}")
 ```
 
 ## Storage Structure
