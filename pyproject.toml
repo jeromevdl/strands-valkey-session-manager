@@ -1,0 +1,104 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "strands-valkey-session-manager"
+dynamic = ["version"]
+description = "A session manager for Valkey/Redis using Strands"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICEN[CS]E*"]
+authors = [
+    {name = "Jerome Van Der Linden", email = "jeromevdl@gmail.com"},
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13"
+]
+dependencies = [
+    "strands-agents>=1.0.0,<2.0.0",
+    "valkey>=6.0.0,<7.0.0"
+]
+
+[tool.hatch.envs.dev]
+dependencies = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "black",
+    "isort",
+    "mypy",
+]
+
+[tool.hatch.envs.dev.scripts]
+test = "pytest -m 'not integration' {args}"
+test-cov = "pytest -m 'not integration' --cov=src/strands_valkey_session_manager {args}"
+test-all = "pytest {args}"
+test-integ = "pytest -m integration {args}"
+format = "hatch fmt --formatter"
+test-format = "hatch fmt --formatter --check"
+lint = "hatch fmt --linter"
+test-lint = "hatch fmt --linter --check"
+type-check = "mypy {args:src}"
+
+[project.urls]
+Homepage = "https://github.com/jeromevdl/strands-valkey-session-manager"
+Repository = "https://github.com/jeromevdl/strands-valkey-session-manager"
+Issues = "https://github.com/jeromevdl/strands-valkey-session-manager/issues"
+
+[tool.hatch.version]
+path = "src/strands_valkey_session_manager/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/strands_valkey_session_manager"]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.ruff]
+line-length = 120
+include = ["src/**/*.py", "tests/**/*.py"]
+
+[tool.ruff.lint]
+select = [
+  "B",   # flake8-bugbear
+  "D",   # pydocstyle
+  "E",   # pycodestyle
+  "F",   # pyflakes
+  "G",   # logging format
+  "I",   # isort
+  "LOG", # logging
+]
+
+[tool.ruff.lint.per-file-ignores]
+"!src/**/*.py" = ["D"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+context = "thread"
+parallel = true
+concurrency = ["thread", "multiprocessing"]
+
+[tool.coverage.report]
+show_missing = true
+
+[tool.coverage.html]
+directory = "build/coverage/html"
+
+[tool.coverage.xml]
+output = "build/coverage/coverage.xml"
