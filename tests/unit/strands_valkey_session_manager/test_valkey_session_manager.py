@@ -79,6 +79,28 @@ def test_create_session(valkey_manager, sample_session, mock_valkey_client):
     assert args[1] == "session:test-session-123"
     assert args[2] == "$"
 
+    mock_valkey_client.expire.assert_not_called()
+
+
+def test_create_session_with_expiry(valkey_manager, sample_session, mock_valkey_client):
+    """Test creating a session in Valkey."""
+    mock_valkey_client.exists.return_value = False
+    valkey_manager.session_expiry = 3600
+
+    result = valkey_manager.create_session(sample_session)
+
+    assert result == sample_session
+    mock_valkey_client.execute_command.assert_called_once()
+    args = mock_valkey_client.execute_command.call_args[0]
+    assert args[0] == "JSON.SET"
+    assert args[1] == "session:test-session-123"
+    assert args[2] == "$"
+
+    mock_valkey_client.expire.assert_called_once()
+    args = mock_valkey_client.expire.call_args[0]
+    assert args[0] == "session:test-session-123"
+    assert args[1] == 3600
+
 
 def test_create_session_already_exists(valkey_manager, sample_session, mock_valkey_client):
     """Test creating a session that already exists."""
@@ -134,6 +156,24 @@ def test_create_agent(valkey_manager, sample_session, sample_agent, mock_valkey_
     assert args[0] == "JSON.SET"
     assert args[1] == "session:test-session-123:agent:test-agent-456"
 
+    mock_valkey_client.expire.assert_not_called()
+
+
+def test_create_agent_with_expiry(valkey_manager, sample_session, sample_agent, mock_valkey_client):
+    """Test creating an agent in Valkey."""
+    valkey_manager.session_expiry = 3600
+    valkey_manager.create_agent(sample_session.session_id, sample_agent)
+
+    mock_valkey_client.execute_command.assert_called_once()
+    args = mock_valkey_client.execute_command.call_args[0]
+    assert args[0] == "JSON.SET"
+    assert args[1] == "session:test-session-123:agent:test-agent-456"
+
+    mock_valkey_client.expire.assert_called_once()
+    args = mock_valkey_client.expire.call_args[0]
+    assert args[0] == "session:test-session-123:agent:test-agent-456"
+    assert args[1] == 3600
+
 
 def test_read_agent(valkey_manager, sample_session, sample_agent, mock_valkey_client):
     """Test reading an agent from Valkey."""
@@ -184,6 +224,24 @@ def test_create_message(valkey_manager, sample_session, sample_agent, sample_mes
     args = mock_valkey_client.execute_command.call_args[0]
     assert args[0] == "JSON.SET"
     assert args[1] == "session:test-session-123:agent:test-agent-456:message:0"
+
+    mock_valkey_client.expire.assert_not_called()
+
+
+def test_create_message_with_expiry(valkey_manager, sample_session, sample_agent, sample_message, mock_valkey_client):
+    """Test creating a message in Valkey."""
+    valkey_manager.session_expiry = 3600
+    valkey_manager.create_message(sample_session.session_id, sample_agent.agent_id, sample_message)
+
+    mock_valkey_client.execute_command.assert_called_once()
+    args = mock_valkey_client.execute_command.call_args[0]
+    assert args[0] == "JSON.SET"
+    assert args[1] == "session:test-session-123:agent:test-agent-456:message:0"
+
+    mock_valkey_client.expire.assert_called_once()
+    args = mock_valkey_client.expire.call_args[0]
+    assert args[0] == "session:test-session-123:agent:test-agent-456:message:0"
+    assert args[1] == 3600
 
 
 def test_read_message(valkey_manager, sample_session, sample_agent, sample_message, mock_valkey_client):

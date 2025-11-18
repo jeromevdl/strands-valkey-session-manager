@@ -5,7 +5,7 @@ This enables agents to maintain conversation history and state across multiple i
 
 Tested with Elasticache Serverless ([Redis 7.1](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/GettingStarted.serverless-redis.step1.html), [Valkey 8.1](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/GettingStarted.serverless-valkey.step1.html)), 
 Elasticache ([Redis 7.1](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/SubnetGroups.designing-cluster-pre.redis.html), [Valkey 8.2](https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/SubnetGroups.designing-cluster-pre.valkey.html)) 
-and [Upstash](https://upstash.com/).
+, [Upstash](https://upstash.com/) and [`redis/redis-stack`](https://hub.docker.com/r/redis/redis-stack)
 
 ## Features
 
@@ -73,13 +73,15 @@ session:<session_id>:agent:<agent_id>:message:<message_id>  # Individual message
 ```python
 ValkeySessionManager(
     session_id: str,
-    client: Union[valkey.Valkey, valkey.ValkeyCluster]
+    client: Union[valkey.Valkey, valkey.ValkeyCluster],
+    session_expiry: Optional[int] = None,
 )
 ```
 
 **Parameters:**
 - `session_id`: Unique identifier for the session
 - `client`: Configured Valkey client instance (only synchronous versions are supported)
+- `session_expiry`: Optional expiry time for Valkey keys, in seconds
 
 **Methods** (Note that these methods are used transparently by Strands):
 - `create_session(session)`: Create a new session

@@ -2,7 +2,7 @@
 
 import json
 import logging
-from typing import Any, cast
+from typing import Any, cast, Optional
 
 import valkey
 from strands.session import RepositorySessionManager, SessionRepository
@@ -27,15 +27,23 @@ class ValkeySessionManager(RepositorySessionManager, SessionRepository):
     ```
     """
 
-    def __init__(self, session_id: str, client: valkey.Valkey | valkey.ValkeyCluster, **kwargs: Any):
+    def __init__(
+        self,
+        session_id: str,
+        client: valkey.Valkey | valkey.ValkeyCluster,
+        session_expiry: Optional[int] = None,
+        **kwargs: Any
+    ):
         """Initialize ValkeySessionManager with Valkey storage.
 
         Args:
             session_id: ID for the session
             client: Pre-configured Valkey client (Valkey or ValkeyCluster)
+            session_expiry: Expiry time for the session in seconds
             **kwargs: Additional keyword arguments for future extensibility.
         """
         self.client = client
+        self.session_expiry = session_expiry
         super().__init__(session_id=session_id, session_repository=self)
 
     def _get_session_key(self, session_id: str) -> str:
@@ -101,6 +109,8 @@ class ValkeySessionManager(RepositorySessionManager, SessionRepository):
         try:
             json_data = json.dumps(data, ensure_ascii=False)
             self.client.execute_command("JSON.SET", key, "$", json_data)
+            if self.session_expiry is not None:
+                self.client.expire(key, self.session_expiry)
         except Exception as e:
             raise SessionException(f"Failed to write Valkey object {key}: {e}") from e
 
