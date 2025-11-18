@@ -125,7 +125,7 @@ Integration tests require a running Valkey/Redis instance:
 
 ```bash
 # Start Redis with JSON (Docker)
-docker run -d -p 6379:6379 redislabs/rejson:latest
+docker run -d -p 6379:6379 redis/redis-stack:latest
 
 # Run integration tests
 hatch run dev:test-integration
